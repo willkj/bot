@@ -27,6 +27,7 @@ def autosave(sched):
 
 
 def commit():
+    # print("commiting...")
     cxn.commit()
 
 def close():
