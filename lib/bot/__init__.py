@@ -34,9 +34,9 @@ class Bot(BotBase):
         print("running bot...")
         super().run(self.TOKEN, reconnect=True)
 
-   async def rules_reminder(self):
-       channel = self.get_channel(894574583892549712)
-       await channel.send("Notificação cronometrada!")
+    async def rules_reminder(self):
+        channel = self.get_channel(920321834321342560)
+        await channel.send("Notificação cronometrada!")
 
 
     async def on_connect(self):
@@ -49,7 +49,7 @@ class Bot(BotBase):
         if err == "on_command_error":
             await args[0].send("Algo deu errado")
         
-        channel = self.get_channel(894574583892549712)
+        channel = self.get_channel(920321834321342560)
         await channel.send("Ocorreu um erro!")
         raise
     
@@ -68,11 +68,11 @@ class Bot(BotBase):
     async def on_ready(self):
         if not self.ready:
             self.ready = True
-            self.guild = self.get_guild(887668262941392896)
-            self.scheduler.add_job(self.rules_reminder, CronTrigger(day_of_week=0, hour=12, minute=0, second=0))
+            self.guild = self.get_guild(920321834321342554)
+            self.scheduler.add_job(self.rules_reminder, CronTrigger(second="0, 15, 30, 45"))
             self.scheduler.start()
 
-            channel = self.get_channel(894574583892549712)
+            channel = self.get_channel(920321834321342560)
             await channel.send("Online agora!")
 
             # embed = Embed(title="Online Agora!", description="Lif agora Online!", 
