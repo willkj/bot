@@ -95,8 +95,8 @@ class Bot(BotBase):
     async def on_ready(self):
         if not self.ready:
             self.ready = True
-            self.guild = self.get_guild(887668262941392896)
-            self.stdout = self.get_channel(894574583892549712)
+            self.guild = self.get_guild(920321834321342554)
+            self.stdout = self.get_channel(920321834321342560)
             self.scheduler.add_job(self.rules_reminder, CronTrigger(day_of_week=0, hour=12, minute=0, second=0))
             self.scheduler.start()
 
@@ -122,7 +122,7 @@ class Bot(BotBase):
 
             await self.stdout.send("Online agora!")
             self.ready = True
-            print(" bot ready")
+            print("bot ready")
 
 
         else:
