@@ -90,7 +90,7 @@ class Bot(BotBase):
             # await channel.send(embed=embed)
             # await channel.send(file=File("./data/images/profile.png"))
             
-            print("bot ready")
+            print("bot ready!")
 
 
         else:
