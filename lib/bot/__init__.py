@@ -97,8 +97,8 @@ class Bot(BotBase):
         if not self.ready:
             self.ready = True
             self.guild = self.get_guild(920321834321342554)
-            self.scheduler.add_job(self.rules_reminder, CronTrigger(second="0, 15, 30, 45"))
-            self.scheduler.start()
+            self.scheduler.add_job(self.rules_reminder, CronTrigger(second=15))
+            # self.scheduler.start()
 
             channel = self.get_channel(920321834321342560)
             await channel.send("Online agora!")
