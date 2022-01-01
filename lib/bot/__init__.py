@@ -63,8 +63,7 @@ class Bot(BotBase):
         super().run(self.TOKEN, reconnect=True)
 
     async def rules_reminder(self):
-        channel = self.get_channel(920321834321342560)
-        await channel.send("Notificação cronometrada!")
+        await self.stdout.send("Notificação cronometrada!")
 
 
     async def on_connect(self):
@@ -77,8 +76,7 @@ class Bot(BotBase):
         if err == "on_command_error":
             await args[0].send("Algo deu errado")
         
-        channel = self.get_channel(920321834321342560)
-        await channel.send("Ocorreu um erro!")
+        await self.stdout.send("Ocorreu um erro!")
         raise
     
     async def on_command_error(self, ctx, exc):
@@ -97,11 +95,10 @@ class Bot(BotBase):
         if not self.ready:
             self.ready = True
             self.guild = self.get_guild(920321834321342554)
-            self.scheduler.add_job(self.rules_reminder, CronTrigger(second=15))
+            self.stdout = self.get_channel(920321834321342560)
+            self.scheduler.add_job(self.rules_reminder, CronTrigger(day_of_week=0, hour=12, minute=0, second=15))
             # self.scheduler.start()
 
-            channel = self.get_channel(920321834321342560)
-            await channel.send("Online agora!")
 
             # embed = Embed(title="Online Agora!", description="Lif agora Online!", 
             #             colour=0xFF0000, timestamp=datetime.utcnow())
@@ -118,6 +115,11 @@ class Bot(BotBase):
             # await channel.send(embed=embed)
             # await channel.send(file=File("./data/images/profile.png"))
             
+            while not self.cogs_ready.all_ready():
+                await sleep(0.5)
+
+            await self.stdout.send("Online agora!")
+
             print("bot ready!")
 
 
