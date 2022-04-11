@@ -5,6 +5,7 @@ from apscheduler.schedulers.asyncio import AsyncIOScheduler
 from apscheduler.triggers.cron import CronTrigger
 from discord import Embed, File
 from discord.ext.commands import Bot as BotBase
+from discord.ext.commands import Context
 from datetime import datetime
 from discord.ext.commands import CommandNotFound
 
@@ -61,6 +62,17 @@ class Bot(BotBase):
 
         print("running bot...")
         super().run(self.TOKEN, reconnect=True)
+    
+    async def process_commands(self, message):
+        ctx = await self.get_context(message, cls=Context)
+        
+        if ctx.command is not None and ctx.guild is not None:
+            if self.ready:
+                await self.invoke(ctx)
+
+            else:
+                await ctx.send('Im not ready to receive commands. Please wait a few seconds.')
+
 
     async def rules_reminder(self):
         await self.stdout.send("Notificação cronometrada!")
@@ -93,7 +105,6 @@ class Bot(BotBase):
     
     async def on_ready(self):
         if not self.ready:
-            self.ready = True
             self.guild = self.get_guild(920321834321342554)
             self.stdout = self.get_channel(920321834321342560)
             self.scheduler.add_job(self.rules_reminder, CronTrigger(day_of_week=0, hour=12, minute=0, second=15))
@@ -119,7 +130,7 @@ class Bot(BotBase):
                 await sleep(0.5)
 
             await self.stdout.send("Online agora!")
-
+            self.ready = True
             print("bot ready!")
 
 
@@ -127,7 +138,10 @@ class Bot(BotBase):
             print("bot reconnected")
     
     async def on_message(self, message):
-        pass
+        # if message.author.bot and message.author != message.guild.me:
+        if not message.author.bot:
+            await self.process_commands(message)
+
 
 bot = Bot()
     
