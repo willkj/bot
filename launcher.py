@@ -1,9 +1,9 @@
 from lib.bot import bot
 
 # Versão
-VERSION = "0.0.7"
+VERSION = "0.0.9"
 
 bot.run(VERSION)
 
-#Aula 11 - Carberra
+#Aula 15 - Carberra
 

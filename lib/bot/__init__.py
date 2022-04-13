@@ -94,8 +94,9 @@ class Bot(BotBase):
         raise
     
     async def on_command_error(self, ctx, exc):
-        if any([isinstance(error, exc) for error in IGNORE_EXCEPTIONS]):
+        if any([isinstance(exc, error) for error in IGNORE_EXCEPTIONS]):
             pass
+        
         elif isinstance(exc, BadArgument):
             pass
             
