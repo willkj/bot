@@ -3,12 +3,14 @@ from random import choice, randint
 from typing import Optional
 
 from aiohttp import request
-from discord import Member
+from discord import Member, Embed
 from discord.errors import HTTPException
-from discord.ext.commands import Cog
+from discord.ext.commands import Cog, BucketType
 from discord.ext.commands import BadArgument
-from discord.ext.commands import command
-from discord import Embed
+from discord.ext.commands import command, cooldown
+
+
+
 class Fun(Cog):
     def __init__(self, bot):
         self.bot = bot
@@ -19,6 +21,7 @@ class Fun(Cog):
         await ctx.send(f"{choice(('Olá', 'Oi',))} {ctx.author.mention}!")
 
     @command(name="dice", aliases=["roll"])
+    @cooldown(1, 60, BucketType.user)
     async def roll_dice(self, ctx, die_string: str):
         dice , value = (int(term) for term in die_string.split("d"))
         if dice <= 25:
@@ -41,15 +44,16 @@ class Fun(Cog):
             await ctx.send("I can't find that member.")
 
     @command(name="echo", aliases=["say"])
+    @cooldown(1, 15, BucketType.guild)
     async def echo_message(self, ctx, *, message):
         await ctx.message.delete()
         await ctx.send(message)
 
     @command(name="fact")
+    @cooldown(3, 45, BucketType.guild)
     async def animal_fact(self, ctx, animal: str):
         if animal.lower() in ("dog", "cat", "panda", "fox", "bird", "koala"):
             fact_url = f"https://some-random-api.ml/facts/{animal}"
-            
             image_url = f"https://some-random-api.ml/img/{animal}"
             
             async with request("GET", image_url, headers={}) as response:

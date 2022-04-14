@@ -8,7 +8,8 @@ from discord.errors import HTTPException, Forbidden
 from discord.ext.commands import Bot as BotBase
 from discord.ext.commands import Context
 from datetime import datetime
-from discord.ext.commands import (CommandNotFound, BadArgument, MissingRequiredArgument)
+from discord.ext.commands import (CommandNotFound, BadArgument, MissingRequiredArgument,
+                                 CommandOnCooldown)
 
 from ..db import db
 
@@ -97,21 +98,23 @@ class Bot(BotBase):
         if any([isinstance(exc, error) for error in IGNORE_EXCEPTIONS]):
             pass
         
-        elif isinstance(exc, BadArgument):
-            pass
-            
         elif isinstance(exc, MissingRequiredArgument):
             await ctx.send("One or more required arguments are missing.")
+        
+        elif isinstance(exc, CommandOnCooldown):
+            await ctx.send(f"That command is on {str(exc.cooldown.type).split('.')[-1]} cooldown. Try again in {exc.retry_after:.2f} secs")
+        elif hasattr(exc, "original"):
+            # if isinstance(exc.original, HTTPException):
+            #     await ctx.send("Unable to send message.")
 
-        elif isinstance(exc.original, HTTPException):
-            await ctx.send("Unable to send message.")
+            if isinstance(exc.original, Forbidden):
+                await ctx.send("i do not have permission to do that.")
+            else:
+                raise exc.original
 
-        elif isinstance(exc.original, Forbidden):
-            await ctx.send("i do not have permission to do that.")
         else:
-            raise exc.original
+            raise exc
 
-    
     async def on_ready(self):
         if not self.ready:
             self.guild = self.get_guild(920321834321342554)
