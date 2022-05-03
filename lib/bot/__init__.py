@@ -1,5 +1,6 @@
 from asyncio import sleep
 from glob import glob
+from sys import prefix
 from discord import Intents
 from apscheduler.schedulers.asyncio import AsyncIOScheduler
 from apscheduler.triggers.cron import CronTrigger
@@ -10,13 +11,18 @@ from discord.ext.commands import Context
 from datetime import datetime
 from discord.ext.commands import (CommandNotFound, BadArgument, MissingRequiredArgument,
                                  CommandOnCooldown)
+from discord.ext.commands import when_mentioned_or, command, has_permissions
 
 from ..db import db
 
-PREFIX = "."
+# PREFIX = "+"
 OWNER_IDS = [313751695819538432]
 COGS = [path.split("\\")[-1][:-3] for path in glob("./lib/cogs/*.py")]
 IGNORE_EXCEPTIONS = (CommandNotFound, BadArgument)
+
+def get_prefix(bot, message):
+	prefix = db.field("SELECT Prefix FROM guilds WHERE GuildID = ?", message.guild.id)
+	return when_mentioned_or(prefix)(bot, message)
 
 
 class Ready(object):
@@ -34,7 +40,7 @@ class Ready(object):
 
 class Bot(BotBase):
     def __init__(self):
-        self.PREFIX = PREFIX
+        # self.PREFIX = PREFIX
         self.ready = False  
         self.cogs_ready = Ready()
 
@@ -42,7 +48,7 @@ class Bot(BotBase):
         self.scheduler =  AsyncIOScheduler()
         
         db.autosave(self.scheduler)
-        super().__init__(command_prefix=PREFIX,
+        super().__init__(command_prefix=get_prefix,
             owner_ids=OWNER_IDS,
             intents=Intents.all(),
         )
@@ -80,6 +86,14 @@ class Bot(BotBase):
     async def rules_reminder(self):
         await self.stdout.send("Notificação cronometrada!")
 
+    @command(name="prefix")
+    @has_permissions(manage_guild=True)
+    async def change_prefix(self, ctx, new: str):
+        if len(new) > 5:
+            await ctx.send("The prefix can not be more than 5 characters in length.")
+        else:
+            db.execute("UPDATE guilds SET Prefix = ? WHERE GuildID = ?", new, ctx.guild.id)
+            await ctx.send(f"Prefix set to {new}.")
 
     async def on_connect(self):
         print("bot connected")
